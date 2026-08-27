@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:steph_g_food/features/cart/screens/cart_screen.dart';
+import 'package:steph_g_food/features/catalog/models/product.dart';
+import 'package:steph_g_food/features/catalog/screens/product_detail_screen.dart';
 import 'package:steph_g_food/features/commande/screens/commande_screen.dart';
 import 'package:steph_g_food/features/profile/screens/profile_screen.dart';
 import 'main_shell.dart';
@@ -70,6 +72,13 @@ class AppRouter {
         name: 'notifications',
         builder: (context, state) => const Center(child: Text('Écran Notifications')),
       ),
+      GoRoute(
+  path: '/product-detail',
+  builder: (context, state) {
+    final product = state.extra as Product;
+    return ProductDetailScreen(product: product);
+  },
+),
     ],
   );
 }

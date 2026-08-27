@@ -2,45 +2,58 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:steph_g_food/features/catalog/services/product_repository.dart';
 import '../../catalog/models/product.dart';
 
-// Provider du texte de recherche
+// 1. Providers de filtre
 final searchQueryProvider = StateProvider<String>((ref) => '');
-
-// Provider du prix maximum
 final maxPriceFilterProvider = StateProvider<double>((ref) => 30.0);
-
-// Provider de la catégorie sélectionnée ('Tous', 'Burger', 'Pizza', etc.)
 final selectedCategoryProvider = StateProvider<String>((ref) => 'Tous');
 
-// FutureProvider pour lire la liste des produits depuis le Repository
+// 2. Provider de Tri
+enum ProductSortOption { none, priceAsc, priceDesc, nameAsc }
+final productSortOptionProvider = StateProvider<ProductSortOption>((ref) => ProductSortOption.none);
+
+// 3. FutureProvider chargé depuis le repository
 final productsListProvider = FutureProvider<List<Product>>((ref) async {
-  return await ProductRepository.getProducts();
+  final repository = ref.watch(productRepositoryProvider);
+  return await repository.getProducts();
 });
 
-// Provider combiné : applique les 3 filtres dynamiquement
-final searchResultsProvider = Provider<List<Product>>((ref) {
+// 4. Provider combiné qui conserve l'état AsyncValue (loading / data / error)
+final filteredProductsProvider = Provider<AsyncValue<List<Product>>>((ref) {
   final productsAsync = ref.watch(productsListProvider);
-  final query = ref.watch(searchQueryProvider).trim().toLowerCase();
+  final searchQuery = ref.watch(searchQueryProvider);
   final maxPrice = ref.watch(maxPriceFilterProvider);
   final selectedCategory = ref.watch(selectedCategoryProvider);
+  final sortOption = ref.watch(productSortOptionProvider);
 
-  return productsAsync.maybeWhen(
-    data: (products) {
-      return products.where((product) {
-        // 1. Filtre par recherche textuelle (Nom ou Description)
-        final matchesQuery = query.isEmpty ||
-            product.name.toLowerCase().contains(query) ||
-            product.description.toLowerCase().contains(query);
+  return productsAsync.whenData((products) {
+    var result = products.where((product) {
+      final matchesSearch = product.name
+          .toLowerCase()
+          .contains(searchQuery.toLowerCase());
 
-        // 2. Filtre par prix max
-        final matchesPrice = product.price <= maxPrice;
+      final matchesCategory = selectedCategory == 'Tous' ||
+          product.category == selectedCategory;
 
-        // 3. Filtre par catégorie
-        final matchesCategory = selectedCategory == 'Tous' ||
-            product.category.toLowerCase() == selectedCategory.toLowerCase();
+      final matchesPrice = product.price <= maxPrice;
 
-        return matchesQuery && matchesPrice && matchesCategory;
-      }).toList();
-    },
-    orElse: () => [],
-  );
+      return matchesSearch && matchesCategory && matchesPrice;
+    }).toList();
+
+    // Application du tri
+    switch (sortOption) {
+      case ProductSortOption.priceAsc:
+        result.sort((a, b) => a.price.compareTo(b.price));
+        break;
+      case ProductSortOption.priceDesc:
+        result.sort((a, b) => b.price.compareTo(a.price));
+        break;
+      case ProductSortOption.nameAsc:
+        result.sort((a, b) => a.name.compareTo(b.name));
+        break;
+      case ProductSortOption.none:
+        break;
+    }
+
+    return result;
+  });
 });

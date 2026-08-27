@@ -1,84 +1,61 @@
 import 'package:flutter/material.dart';
-import 'package:steph_g_food/features/catalog/models/product.dart';
-import '../services/favorites_service.dart';
-import '../services/product_repository.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:steph_g_food/features/catalog/providers/favorites_notifier.dart';
+import 'package:steph_g_food/features/search/providers/search_provider.dart';
 import '../widgets/product_card.dart';
 
-class ProductListScreen extends StatefulWidget {
+class ProductListScreen extends ConsumerWidget {
   const ProductListScreen({Key? key}) : super(key: key);
 
   @override
-  State<ProductListScreen> createState() => _ProductListScreenState();
-}
-
-class _ProductListScreenState extends State<ProductListScreen> {
-  List<Product> _products = [];
-  Set<String> _favoriteIds = {};
-  bool _isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadData();
-  }
-
-  // Chargement asynchrone des données dynamiques (Favoris + Produits JSON)
-  Future<void> _loadData() async {
-    setState(() => _isLoading = true);
+  Widget build(BuildContext context, WidgetRef ref) {
+    // 1. Écoute dynamique de la liste des produits filtrés et triés
+    final products = ref.watch(searchResultsProvider);
     
-    final favorites = await FavoritesService.getFavorites();
-    final products = await ProductRepository.getProducts();
-
-    setState(() {
-      _favoriteIds = favorites.toSet();
-      _products = products;
-      _isLoading = false;
-    });
-  }
-
-  Future<void> _toggleFavorite(String productId) async {
-    final isFav = await FavoritesService.toggleFavorite(productId);
-    setState(() {
-      if (isFav) {
-        _favoriteIds.add(productId);
-      } else {
-        _favoriteIds.remove(productId);
-      }
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    if (_products.isEmpty) {
-      return const Center(child: Text("Aucun produit disponible"));
-    }
+    // 2. Écoute réactive de la liste des favoris
+    final favoriteIds = ref.watch(favoritesNotifierProvider);
+    
+    // 3. Écoute de l'état de chargement initial des produits
+    final productsAsync = ref.watch(productsListProvider);
 
     return Scaffold(
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          return GridView.builder(
-  shrinkWrap: true,
-  physics: const NeverScrollableScrollPhysics(),
-  padding: const EdgeInsets.all(12),
-  itemCount: _products.length,
-  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-    crossAxisCount: 2,       
-    crossAxisSpacing: 12,    
-    mainAxisSpacing: 12,     
-    childAspectRatio: 0.7, 
-  ),
-  itemBuilder: (context, index) {
-    return ProductCard(
-      product: _products[index],
-      isFavorite: _favoriteIds.contains(_products[index].id),
-      onFavoriteToggle: () => _toggleFavorite(_products[index].id),
-    );
-  },
-);
+      body: productsAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, stack) => Center(child: Text('Erreur : $error')),
+        data: (_) {
+          if (products.isEmpty) {
+            return const Center(child: Text('Aucun produit disponible'));
+          }
+
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              return GridView.builder(
+                padding: const EdgeInsets.all(12),
+                itemCount: products.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                  childAspectRatio: 0.7,
+                ),
+                itemBuilder: (context, index) {
+                  final product = products[index];
+                  final isFav = favoriteIds.contains(product.id);
+
+                  return ProductCard(
+                    product: product,
+                    isFavorite: isFav,
+                    onFavoriteToggle: () {
+                      // Action réactive via le Notifier Riverpod (avec persistance)
+                      ref
+                          .read(favoritesNotifierProvider.notifier)
+                          .toggleFavorite(product.id);
+                    },
+                  );
+                },
+              );
+            },
+          );
         },
       ),
     );

@@ -1,57 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import '../providers/search_provider.dart';
+import 'package:steph_g_food/features/catalog/models/product.dart';
+import 'package:steph_g_food/features/catalog/providers/favorites_notifier.dart';
+import 'package:steph_g_food/features/catalog/providers/products_provider.dart';
+import 'package:steph_g_food/features/catalog/widgets/catalog_filter_bar.dart';
+import '../providers/search_provider.dart' hide filteredProductsProvider;
 import '../../catalog/widgets/product_card.dart';
-import 'package:steph_g_food/features/catalog/widgets/category_selector.dart';
 
 class SearchScreen extends ConsumerWidget {
   const SearchScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final searchResults = ref.watch(searchResultsProvider);
-    final searchQuery = ref.watch(searchQueryProvider);
-    final maxPrice = ref.watch(maxPriceFilterProvider);
-    final productsAsync = ref.watch(productsListProvider);
-    final theme = Theme.of(context);
+Widget build(BuildContext context, WidgetRef ref) {
+  final theme = Theme.of(context);
 
-    return Scaffold(
-      body: CustomScrollView(
+  // 1. Récupération des états depuis Riverpod
+  final maxPrice = ref.watch(maxPriceFilterProvider);
+  final favoriteIds = ref.watch(favoritesNotifierProvider);
+  final allProductsAsync = ref.watch(productsListProvider);
+  
+  // 2. Écoute du provider filtré (Typé en AsyncValue<List<Product>>)
+  final AsyncValue<List<Product>> productsAsync = ref.watch(filteredProductsProvider as ProviderListenable<AsyncValue<List<Product>>>);
+
+final List<String> categories = allProductsAsync.maybeWhen(
+    data: (products) {
+      final uniqueCategories = products.map((p) => p.category).toSet().toList();
+      return ['Tous', ...uniqueCategories];
+    },
+    orElse: () => ['Tous'],
+  );
+  return Scaffold(
+    body: SafeArea(
+      child: CustomScrollView(
         slivers: [
-          // Barre de recherche et filtres
+          // En-tête : Filtres et Slider de prix
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Champ de texte dynamique
-                  TextField(
-                    onChanged: (value) {
-                      ref.read(searchQueryProvider.notifier).state = value;
-                    },
-                    decoration: InputDecoration(
-                      hintText: 'Rechercher un plat (ex: Burger, Pizza)...',
-                      prefixIcon: const Icon(LucideIcons.search),
-                      suffixIcon: searchQuery.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(LucideIcons.x),
-                              onPressed: () {
-                                ref.read(searchQueryProvider.notifier).state = '';
-                              },
-                            )
-                          : null,
-                      filled: true,
-                      fillColor: ColorScheme.dark(primary: Theme.of(context).colorScheme.primary).primary.withOpacity(0.1),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  const CategorySelector(),
+                  CatalogFilterBar(categories: categories),
                   const SizedBox(height: 16),
 
                   // Filtre par Prix Maximum
@@ -81,39 +71,49 @@ class SearchScreen extends ConsumerWidget {
                     label: '${maxPrice.toStringAsFixed(1)} €',
                     activeColor: theme.colorScheme.primary,
                     onChanged: (value) {
-                      ref.read(maxPriceFilterProvider.notifier).state = value;
+                      ref
+                          .read(maxPriceFilterProvider.notifier)
+                          .state = value;
                     },
                   ),
                   const SizedBox(height: 10),
-                  Text(
-                    '${searchResults.length} résultat(s) trouvé(s)',
-                    style: theme.textTheme.bodySmall?.copyWith(color: Colors.grey),
+
+                  // Nombre de résultats
+                  productsAsync.maybeWhen(
+                    data: (products) => Text(
+                      '${products.length} résultat(s) trouvé(s)',
+                      style: theme.textTheme.bodySmall
+                          ?.copyWith(color: Colors.grey),
+                    ),
+                    orElse: () => const SizedBox.shrink(),
                   ),
                 ],
               ),
             ),
           ),
 
-          // Gestion des états Asynchrones et de la Liste de Résultats
+          // Grille de produits sous forme de Sliver
           productsAsync.when(
-            loading: () => const SliverFillRemaining(
-              child: Center(child: CircularProgressIndicator()),
-            ),
-            error: (err, stack) => SliverFillRemaining(
-              child: Center(child: Text('Erreur : $err')),
-            ),
-            data: (_) {
-              if (searchResults.isEmpty) {
-                return const SliverFillRemaining(
+            data: (products) {
+              if (products.isEmpty) {
+                return SliverFillRemaining(
+                  hasScrollBody: false,
                   child: Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(LucideIcons.searchX, size: 48, color: Colors.grey),
-                        SizedBox(height: 12),
+                        Icon(
+                          LucideIcons.searchX,
+                          size: 64,
+                          color: theme.colorScheme.outline,
+                        ),
+                        const SizedBox(height: 12),
                         Text(
-                          'Aucun plat ne correspond à votre recherche.',
-                          style: TextStyle(color: Colors.grey),
+                          'Aucun produit ne correspond à vos critères',
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            color: theme.colorScheme.outline,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
                       ],
                     ),
@@ -122,28 +122,49 @@ class SearchScreen extends ConsumerWidget {
               }
 
               return SliverPadding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                sliver: SliverList(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                sliver: SliverGrid(
+                  gridDelegate:
+                      const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 0.72,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                  ),
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
-                      final product = searchResults[index];
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 16),
-                        child: ProductCard(
-                          product: product,
-                          isFavorite: false,
-                          onFavoriteToggle: () {},
-                        ),
+                      final product = products[index];
+                      final isFav = favoriteIds.contains(product.id);
+
+                      return ProductCard(
+                        product: product,
+                        isFavorite: isFav,
+                        onFavoriteToggle: () {
+                          ref
+                              .read(favoritesNotifierProvider.notifier)
+                              .toggleFavorite(product.id);
+                        },
                       );
                     },
-                    childCount: searchResults.length,
+                    childCount: products.length,
                   ),
                 ),
               );
             },
+            loading: () => const SliverFillRemaining(
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
+            ),
+            error: (error, stackTrace) => SliverFillRemaining(
+              child: Center(
+                child: Text('Erreur lors du chargement : $error'),
+              ),
+            ),
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 }

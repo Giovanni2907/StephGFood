@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:steph_g_food/features/cart/providers/cart_provider.dart';
 import 'package:steph_g_food/features/catalog/models/product.dart';
 
@@ -27,23 +28,22 @@ class ProductCard extends ConsumerWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: isDarkMode 
-                ? Colors.black.withOpacity(0.3) 
+            color: isDarkMode
+                ? Colors.black.withOpacity(0.3)
                 : Colors.black.withOpacity(0.05),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
         ],
       ),
-      // Material + InkWell permettent d'intercepter le clic avec un effet d'onde (ripple effect)
       child: Material(
         color: Colors.transparent,
         borderRadius: BorderRadius.circular(16),
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
           onTap: () {
-            // 1. Ajouter le produit au panier via Riverpod
-            ref.read(cartNotifierProvider.notifier).addProduct(product);
+            // Navigation vers l'écran de détail du produit
+            context.push('/product-detail', extra: product);
           },
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -51,18 +51,23 @@ class ProductCard extends ConsumerWidget {
               Stack(
                 children: [
                   ClipRRect(
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                    child: Image.asset(
-                      product.image,
-                      height: 100,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Container(
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(16),
+                    ),
+                    child: Hero(
+                      tag: 'product-image-${product.id}',
+                      child: Image.asset(
+                        product.image,
                         height: 100,
-                        color: isDarkMode ? Colors.grey[800] : Colors.grey[300],
-                        child: Icon(
-                          Icons.image_not_supported, 
-                          color: isDarkMode ? Colors.grey[500] : Colors.grey[600],
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          height: 100,
+                          color: isDarkMode ? Colors.grey[800] : Colors.grey[300],
+                          child: Icon(
+                            Icons.image_not_supported,
+                            color: isDarkMode ? Colors.grey[500] : Colors.grey[600],
+                          ),
                         ),
                       ),
                     ),
@@ -71,19 +76,16 @@ class ProductCard extends ConsumerWidget {
                     top: 8,
                     right: 8,
                     child: GestureDetector(
-                      // Evite d'ajouter au panier quand on clique uniquement sur le coeur
-                      onTap: () {
-                        onFavoriteToggle();
-                      },
+                      onTap: onFavoriteToggle,
                       child: CircleAvatar(
                         radius: 16,
-                        backgroundColor: isDarkMode 
-                            ? Colors.black.withOpacity(0.6) 
+                        backgroundColor: isDarkMode
+                            ? Colors.black.withOpacity(0.6)
                             : Colors.white.withOpacity(0.9),
                         child: Icon(
                           isFavorite ? Icons.favorite : Icons.favorite_border,
-                          color: isFavorite 
-                              ? Colors.red 
+                          color: isFavorite
+                              ? Colors.red
                               : (isDarkMode ? Colors.white70 : Colors.grey),
                           size: 18,
                         ),
@@ -115,7 +117,7 @@ class ProductCard extends ConsumerWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: colorScheme.onSurfaceVariant, 
+                        color: colorScheme.onSurfaceVariant,
                         fontSize: 11,
                       ),
                     ),
@@ -131,11 +133,27 @@ class ProductCard extends ConsumerWidget {
                             color: colorScheme.primary,
                           ),
                         ),
-                        // Petit bouton + visuel explicite
-                        Icon(
-                          Icons.add_shopping_cart,
-                          size: 18,
-                          color: colorScheme.primary,
+                        // Bouton rapide d'ajout au panier
+                        IconButton(
+                          constraints: const BoxConstraints(),
+                          padding: EdgeInsets.zero,
+                          icon: Icon(
+                            Icons.add_shopping_cart,
+                            size: 20,
+                            color: colorScheme.primary,
+                          ),
+                          onPressed: () {
+                            ref
+                                .read(cartNotifierProvider.notifier)
+                                .addProduct(product);
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('${product.name} ajouté au panier'),
+                                duration: const Duration(seconds: 1),
+                              ),
+                            );
+                          },
                         ),
                       ],
                     ),

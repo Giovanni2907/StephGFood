@@ -21,7 +21,7 @@ class MainShell extends ConsumerWidget {
         title: Text('SGF', style: TextStyle(fontWeight: FontWeight.values[7], fontSize: 15, color: AppColors.primary)),
         actions: [
           IconButton(
-            icon: const Icon(LucideIcons.sunMedium),
+            icon: const Icon(LucideIcons.sunMedium),  
             onPressed: () => ref.read(themeNotifierProvider.notifier).toggleTheme(),
           ),
           Stack(

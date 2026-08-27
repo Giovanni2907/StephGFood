@@ -1,14 +1,34 @@
 import 'dart:convert';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:steph_g_food/core/constants/app_assets.dart';
 import 'package:steph_g_food/features/catalog/models/product.dart';
 
+// Provider synchrone pour SharedPreferences (surchargé dans main.dart)
+final sharedPreferencesProvider = Provider<SharedPreferences>((ref) {
+  throw UnimplementedError('SharedPreferences doit être initialisé dans main.dart');
+});
+
+// Provider du Repository
+final productRepositoryProvider = Provider<ProductRepository>((ref) {
+  final prefs = ref.watch(sharedPreferencesProvider);
+  return ProductRepository(prefs);
+});
+
+// FutureProvider pour charger la liste initiale/persistée des produits
+final productsListProvider = FutureProvider<List<Product>>((ref) async {
+  final repository = ref.watch(productRepositoryProvider);
+  return repository.getProducts();
+});
+
 class ProductRepository {
+  final SharedPreferences _prefs;
   static const String _productsKey = 'local_products_json_list';
 
-  static Future<List<Product>> getProducts() async {
-    final prefs = await SharedPreferences.getInstance();
-    final String? productsJsonString = prefs.getString(_productsKey);
+  ProductRepository(this._prefs);
+
+  Future<List<Product>> getProducts() async {
+    final String? productsJsonString = _prefs.getString(_productsKey);
 
     if (productsJsonString == null || productsJsonString.isEmpty) {
       final initialProducts = _getInitialDummyData();
@@ -20,36 +40,32 @@ class ProductRepository {
     return jsonList.map((item) => Product.fromJson(item)).toList();
   }
 
-  static Future<void> saveProducts(List<Product> products) async {
-    final prefs = await SharedPreferences.getInstance();
+  Future<void> saveProducts(List<Product> products) async {
     final List<Map<String, dynamic>> jsonList =
         products.map((p) => p.toJson()).toList();
     final String jsonString = jsonEncode(jsonList);
 
-    await prefs.setString(_productsKey, jsonString);
+    await _prefs.setString(_productsKey, jsonString);
   }
 
-  static Future<List<Product>> addProduct(Product newProduct) async {
+  Future<List<Product>> addProduct(Product newProduct) async {
     final currentProducts = await getProducts();
     final updatedList = [...currentProducts, newProduct];
     await saveProducts(updatedList);
     return updatedList;
   }
 
-  // Méthode pour forcer la réinitialisation du cache lors du dev
-  static Future<List<Product>> resetToInitialData() async {
+  Future<List<Product>> resetToInitialData() async {
     await clearProducts();
     return await getProducts();
   }
 
-  static Future<void> clearProducts() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_productsKey);
+  Future<void> clearProducts() async {
+    await _prefs.remove(_productsKey);
   }
 
-  // 1. Identifiants et noms distincts pour chaque produit
   static List<Product> _getInitialDummyData() {
-    return [
+    return const [
       Product(
         id: '1',
         name: 'Burger Classique',
