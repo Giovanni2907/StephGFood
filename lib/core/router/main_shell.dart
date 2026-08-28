@@ -22,7 +22,7 @@ class MainShell extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(LucideIcons.sunMedium),  
-            onPressed: () => ref.read(themeNotifierProvider.notifier).toggleTheme(),
+            onPressed: () => ref.read(themeNotifierProvider.notifier).toggleTheme(false),
           ),
           Stack(
             alignment: Alignment.center,

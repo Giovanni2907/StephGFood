@@ -4,7 +4,7 @@ import '../../catalog/models/product.dart';
 
 // 1. Providers de filtre
 final searchQueryProvider = StateProvider<String>((ref) => '');
-final maxPriceFilterProvider = StateProvider<double>((ref) => 30.0);
+final maxPriceFilterProvider = StateProvider<double>((ref) => 1000000.0);
 final selectedCategoryProvider = StateProvider<String>((ref) => 'Tous');
 
 // 2. Provider de Tri
