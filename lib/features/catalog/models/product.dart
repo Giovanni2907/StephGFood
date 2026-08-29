@@ -1,3 +1,6 @@
+import 'package:flutter/foundation.dart';
+
+@immutable
 class Product {
   final String id;
   final String name;
@@ -19,7 +22,14 @@ class Product {
     this.rating = 4.5,
   });
 
-  // Conversion depuis JSON (utile quand vous brancherez l'API FastAPI plus tard)
+  /// Résout le chemin de l'image (prend en compte les assets locaux et URLs distantes)
+  String get imagePath {
+    if (image.isEmpty) return 'assets/images/placeholder.png';
+    if (image.startsWith('http://') || image.startsWith('https://')) return image;
+    if (image.startsWith('assets/')) return image;
+    return 'assets/images/$image';
+  }
+
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
       id: json['id'] as String,
@@ -33,7 +43,6 @@ class Product {
     );
   }
 
-  // Conversion vers JSON
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -47,7 +56,6 @@ class Product {
     };
   }
 
-  // Copie d'objet pour immutabilité
   Product copyWith({
     String? id,
     String? name,
@@ -67,6 +75,34 @@ class Product {
       image: image ?? this.image,
       isAvailable: isAvailable ?? this.isAvailable,
       rating: rating ?? this.rating,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Product &&
+        other.id == id &&
+        other.name == name &&
+        other.description == description &&
+        other.price == price &&
+        other.category == category &&
+        other.image == image &&
+        other.isAvailable == isAvailable &&
+        other.rating == rating;
+  }
+
+  @override
+  int get hashCode {
+    return Object.hash(
+      id,
+      name,
+      description,
+      price,
+      category,
+      image,
+      isAvailable,
+      rating,
     );
   }
 }

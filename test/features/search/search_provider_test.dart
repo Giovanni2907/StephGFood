@@ -49,7 +49,7 @@ void main() {
         ),
       ],
     );
-    container.listen(filteredProductsProvider, (_, __) {});
+    container.listen(filteredProductsProvider, (_, _) {});
     await container.read(productsListProvider.future);
     return container;
   }

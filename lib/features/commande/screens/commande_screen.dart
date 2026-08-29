@@ -9,7 +9,6 @@ class CommandeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Écoute dynamique des commandes actives et de l'historique
     final activeCommande = ref.watch(activeCommandeProvider);
     final pastCommande = ref.watch(pastCommandeProvider);
 
@@ -21,6 +20,7 @@ class CommandeScreen extends ConsumerWidget {
             'Mes Commandes',
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
+          centerTitle: true,
           bottom: const TabBar(
             tabs: [
               Tab(text: 'En cours'),
@@ -31,58 +31,92 @@ class CommandeScreen extends ConsumerWidget {
         body: TabBarView(
           children: [
             // Onglet 1 : Commandes en cours
-            activeCommande.isEmpty
-                ? const Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          LucideIcons.shoppingBag,
-                          size: 48,
-                          color: Colors.grey,
-                        ),
-                        SizedBox(height: 12),
-                        Text(
-                          'Aucune commande en cours pour le moment.',
-                          style: TextStyle(color: Colors.grey),
-                        ),
-                      ],
-                    ),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: activeCommande.length,
-                    itemBuilder: (context, index) => Padding(
-                      padding: const EdgeInsets.only(bottom: 12.0),
-                      child: CommandeCard(order: activeCommande[index]),
-                    ),
-                  ),
+            _OrderList(
+              orders: activeCommande,
+              emptyIcon: LucideIcons.shoppingBag,
+              emptyMessage: 'Aucune commande en cours pour le moment.',
+              onRefresh: () async {
+                // Rafraîchissement éventuel depuis l'API / State
+                ref.invalidate(commandeProvider);
+              },
+            ),
 
             // Onglet 2 : Historique des commandes
-            pastCommande.isEmpty
-                ? const Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(LucideIcons.history, size: 48, color: Colors.grey),
-                        SizedBox(height: 12),
-                        Text(
-                          'Votre historique de commandes est vide.',
-                          style: TextStyle(color: Colors.grey),
-                        ),
-                      ],
-                    ),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: pastCommande.length,
-                    itemBuilder: (context, index) => Padding(
-                      padding: const EdgeInsets.only(bottom: 12.0),
-                      child: CommandeCard(order: pastCommande[index]),
-                    ),
-                  ),
+            _OrderList(
+              orders: pastCommande,
+              emptyIcon: LucideIcons.history,
+              emptyMessage: 'Votre historique de commandes est vide.',
+              onRefresh: () async {
+                ref.invalidate(commandeProvider);
+              },
+            ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Widget interne réutilisable pour afficher une liste de commandes ou un état vide
+class _OrderList extends StatelessWidget {
+  final List<dynamic> orders;
+  final IconData emptyIcon;
+  final String emptyMessage;
+  final Future<void> Function() onRefresh;
+
+  const _OrderList({
+    required this.orders,
+    required this.emptyIcon,
+    required this.emptyMessage,
+    required this.onRefresh,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (orders.isEmpty) {
+      return RefreshIndicator(
+        onRefresh: onRefresh,
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          children: [
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.6,
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      emptyIcon,
+                      size: 56,
+                      color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      emptyMessage,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.outline,
+                        fontSize: 15,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: onRefresh,
+      child: ListView.separated(
+        padding: const EdgeInsets.all(16),
+        itemCount: orders.length,
+        separatorBuilder: (context, index) => const SizedBox(height: 12),
+        itemBuilder: (context, index) {
+          return CommandeCard(order: orders[index]);
+        },
       ),
     );
   }

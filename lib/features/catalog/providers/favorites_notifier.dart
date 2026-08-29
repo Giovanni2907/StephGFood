@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:steph_g_food/features/catalog/services/product_repository.dart';
+import 'package:steph_g_food/core/theme/providers/shared_preferences_provider.dart';
 
 class FavoritesNotifier extends StateNotifier<Set<String>> {
   final SharedPreferences _prefs;

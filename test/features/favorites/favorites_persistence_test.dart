@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:steph_g_food/features/catalog/providers/favorites_notifier.dart';
-import 'package:steph_g_food/features/catalog/services/product_repository.dart';
+import 'package:steph_g_food/core/theme/providers/shared_preferences_provider.dart';
 
 void main() {
   test(

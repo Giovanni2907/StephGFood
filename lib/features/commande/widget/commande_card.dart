@@ -61,7 +61,7 @@ class CommandeCard extends ConsumerWidget {
             if (order.isActive) ...[
               LinearProgressIndicator(
                 value: order.status.progress,
-                backgroundColor: theme.colorScheme.primary.withOpacity(0.1),
+                backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.2),
                 color: theme.colorScheme.primary,
                 borderRadius: BorderRadius.circular(8),
                 minHeight: 8,

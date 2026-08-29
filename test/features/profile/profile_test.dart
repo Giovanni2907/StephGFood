@@ -27,7 +27,6 @@ void main() {
 
       final user = container.read(userProvider);
       expect(user.name, 'Jean Dupont');
-      // Les autres champs restent inchangés
       expect(user.email, 'stephanie@example.com');
     });
 
@@ -60,10 +59,12 @@ void main() {
       'ProfileScreen affiche correctement les informations utilisateur initiales',
       (WidgetTester tester) async {
         await tester.pumpWidget(
-          const ProviderScope(child: MaterialApp(home: ProfileScreen())),
+          const ProviderScope(
+            child: MaterialApp(home: ProfileScreen()),
+          ),
         );
+        await tester.pumpAndSettle();
 
-        // Vérification des données affichées à l'écran
         expect(find.text('Profil'), findsOneWidget);
         expect(find.text('Stephanie Giovanni'), findsOneWidget);
         expect(find.text('stephanie@example.com'), findsOneWidget);
@@ -80,25 +81,35 @@ void main() {
       WidgetTester tester,
     ) async {
       await tester.pumpWidget(
-        const ProviderScope(child: MaterialApp(home: ProfileScreen())),
+        const ProviderScope(
+          child: MaterialApp(home: ProfileScreen()),
+        ),
       );
+      await tester.pumpAndSettle();
 
       // 1. Cliquer sur le bouton d'édition de l'adresse
       final editButton = find.byIcon(Icons.edit_outlined);
       expect(editButton, findsOneWidget);
       await tester.tap(editButton);
-      await tester.pumpAndSettle(); // Ouvrir la boîte de dialogue
+      await tester.pumpAndSettle(); // Attendre l'apparition complète du dialogue
 
       // 2. Vérifier la présence du dialogue
       expect(find.text('Modifier l\'adresse'), findsOneWidget);
 
-      // 3. Remplir les champs du dialogue
+      // 3. Remplir les champs du dialogue et notifier chaque champ avec pump()
       final textFields = find.byType(TextField);
       await tester.enterText(textFields.at(0), '789 Rue des Fleurs');
+      await tester.pump();
+      
       await tester.enterText(textFields.at(1), 'Étage 2');
+      await tester.pump();
 
       // 4. Valider la modification
-      await tester.tap(find.text('Enregistrer'));
+      final saveButton = find.text('Enregistrer');
+      expect(saveButton, findsOneWidget);
+      await tester.tap(saveButton);
+      
+      // Laisser le dialogue se fermer et l'arbre de widgets se reconstruire entièrement
       await tester.pumpAndSettle();
 
       // 5. Vérifier que la nouvelle adresse est affichée dans l'écran de profil
@@ -109,14 +120,17 @@ void main() {
     testWidgets('Activer le Switch de Mode Sombre bascule le thème', (
       WidgetTester tester,
     ) async {
-      late ProviderContainer container;
+      // Instanciation propre du container avec nettoyage après test
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
 
       await tester.pumpWidget(
         UncontrolledProviderScope(
-          container: container = ProviderContainer(),
+          container: container,
           child: const MaterialApp(home: ProfileScreen()),
         ),
       );
+      await tester.pumpAndSettle();
 
       // Vérifier le thème initial (Light)
       expect(container.read(themeNotifierProvider), ThemeMode.light);
@@ -125,6 +139,8 @@ void main() {
       final switchFinder = find.byType(Switch);
       expect(switchFinder, findsOneWidget);
       await tester.tap(switchFinder);
+      
+      // Attendre la fin de l'animation d'ouverture/fermeture du Switch
       await tester.pumpAndSettle();
 
       // Vérifier que le thème est passé en Dark

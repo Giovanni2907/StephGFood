@@ -17,38 +17,46 @@ class ProfileScreen extends ConsumerWidget {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text('Modifier l\'adresse'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: addressController,
-              decoration: const InputDecoration(labelText: 'Adresse'),
+              decoration: const InputDecoration(
+                labelText: 'Adresse',
+                prefixIcon: Icon(Icons.home_outlined),
+              ),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: complementController,
               decoration: const InputDecoration(
-                labelText: 'Complément (ex: Appt)',
+                labelText: 'Complément (ex: Appt, Étage)',
+                prefixIcon: Icon(Icons.info_outline),
               ),
             ),
           ],
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () {
+              addressController.dispose();
+              complementController.dispose();
+              Navigator.pop(dialogContext);
+            },
             child: const Text('Annuler'),
           ),
           ElevatedButton(
             onPressed: () {
-              ref
-                  .read(userProvider.notifier)
-                  .updateAddress(
-                    addressController.text,
-                    complementController.text,
+              ref.read(userProvider.notifier).updateAddress(
+                    addressController.text.trim(),
+                    complementController.text.trim(),
                   );
-              Navigator.pop(context);
+              addressController.dispose();
+              complementController.dispose();
+              Navigator.pop(dialogContext);
             },
             child: const Text('Enregistrer'),
           ),
@@ -64,7 +72,10 @@ class ProfileScreen extends ConsumerWidget {
     final isDarkMode = themeMode == ThemeMode.dark;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Profil')),
+      appBar: AppBar(
+        title: const Text('Profil'),
+        centerTitle: true,
+      ),
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
@@ -74,9 +85,7 @@ class ProfileScreen extends ConsumerWidget {
               children: [
                 CircleAvatar(
                   radius: 45,
-                  backgroundColor: Theme.of(
-                    context,
-                  ).colorScheme.primaryContainer,
+                  backgroundColor: Theme.of(context).colorScheme.primaryContainer,
                   child: Icon(
                     Icons.person,
                     size: 50,
@@ -87,8 +96,8 @@ class ProfileScreen extends ConsumerWidget {
                 Text(
                   user.name,
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
               ],
             ),
@@ -99,9 +108,10 @@ class ProfileScreen extends ConsumerWidget {
           // Section Informations
           Text(
             'Informations personnelles',
-            style: Theme.of(
-              context,
-            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+            style: Theme.of(context)
+                .textTheme
+                .titleMedium
+                ?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           Card(
@@ -120,9 +130,10 @@ class ProfileScreen extends ConsumerWidget {
             children: [
               Text(
                 'Adresse de livraison',
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                style: Theme.of(context)
+                    .textTheme
+                    .titleMedium
+                    ?.copyWith(fontWeight: FontWeight.bold),
               ),
               IconButton(
                 icon: const Icon(Icons.edit_outlined, size: 20),
@@ -138,19 +149,24 @@ class ProfileScreen extends ConsumerWidget {
           Card(
             child: ListTile(
               leading: const Icon(Icons.location_on_outlined),
-              title: Text(user.address),
-              subtitle: Text(user.complement),
+              title: Text(
+                user.address.isEmpty ? 'Aucune adresse renseignée' : user.address,
+              ),
+              subtitle: user.complement.isNotEmpty
+                  ? Text(user.complement)
+                  : null,
             ),
           ),
 
           const SizedBox(height: 16),
 
-          // Section Paramètres
+          // Section Préférences
           Text(
             'Préférences',
-            style: Theme.of(
-              context,
-            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+            style: Theme.of(context)
+                .textTheme
+                .titleMedium
+                ?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           Card(
@@ -159,7 +175,6 @@ class ProfileScreen extends ConsumerWidget {
               secondary: Icon(isDarkMode ? Icons.dark_mode : Icons.light_mode),
               value: isDarkMode,
               onChanged: (bool value) {
-                // Appel de la méthode propre du Notifier
                 ref.read(themeNotifierProvider.notifier).toggleTheme(value);
               },
             ),
