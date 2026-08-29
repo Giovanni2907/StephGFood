@@ -1,9 +1,8 @@
-import 'dart:async'; 
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:steph_g_food/core/constants/app_colors.dart';
 import 'package:steph_g_food/features/catalog/models/list_card.dart';
-
 
 class EcommerceCarouselCard extends StatefulWidget {
   const EcommerceCarouselCard({Key? key}) : super(key: key);
@@ -37,7 +36,7 @@ class _EcommerceCarouselCardState extends State<EcommerceCarouselCard> {
         _pageController.animateToPage(
           nextPage,
           duration: const Duration(milliseconds: 600), // Durée de la transition
-          curve: Curves.easeInOut,                      // Animation fluide
+          curve: Curves.easeInOut, // Animation fluide
         );
       }
     });
@@ -45,7 +44,8 @@ class _EcommerceCarouselCardState extends State<EcommerceCarouselCard> {
 
   @override
   void dispose() {
-    _timer?.cancel(); // 4. IMPORTANT : Toujours annuler le timer pour éviter les fuites de mémoire
+    _timer
+        ?.cancel(); // 4. IMPORTANT : Toujours annuler le timer pour éviter les fuites de mémoire
     _pageController.dispose();
     super.dispose();
   }
@@ -72,10 +72,7 @@ class _EcommerceCarouselCardState extends State<EcommerceCarouselCard> {
                 return Stack(
                   fit: StackFit.expand,
                   children: [
-                    Image.asset(
-                      item.imagePath,
-                      fit: BoxFit.cover,
-                    ),
+                    Image.asset(item.imagePath, fit: BoxFit.cover),
                     Container(
                       decoration: BoxDecoration(
                         gradient: LinearGradient(

@@ -7,10 +7,7 @@ import 'package:steph_g_food/features/catalog/providers/catalog_providers.dart';
 class CatalogFilterBar extends ConsumerWidget {
   final List<String> categories;
 
-  const CatalogFilterBar({
-    super.key,
-    required this.categories,
-  });
+  const CatalogFilterBar({super.key, required this.categories});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -33,8 +30,8 @@ class CatalogFilterBar extends ConsumerWidget {
                   ),
                 ),
                 onChanged: (value) {
-                  ref.read(productFilterProvider.notifier).state =
-                      filter.copyWith(searchQuery: value);
+                  ref.read(productFilterProvider.notifier).state = filter
+                      .copyWith(searchQuery: value);
                 },
               ),
             ),
@@ -45,8 +42,8 @@ class CatalogFilterBar extends ConsumerWidget {
               icon: const Icon(LucideIcons.arrowUpDown),
               tooltip: 'Trier par',
               onSelected: (option) {
-                ref.read(productFilterProvider.notifier).state =
-                    filter.copyWith(sortOption: option);
+                ref.read(productFilterProvider.notifier).state = filter
+                    .copyWith(sortOption: option);
               },
               itemBuilder: (context) => [
                 const PopupMenuItem(
@@ -76,8 +73,8 @@ class CatalogFilterBar extends ConsumerWidget {
                 label: const Text('Tous'),
                 selected: filter.selectedCategory == null,
                 onSelected: (_) {
-                  ref.read(productFilterProvider.notifier).state =
-                      filter.copyWith(clearCategory: true);
+                  ref.read(productFilterProvider.notifier).state = filter
+                      .copyWith(clearCategory: true);
                 },
               ),
               const SizedBox(width: 8),
@@ -89,11 +86,11 @@ class CatalogFilterBar extends ConsumerWidget {
                     label: Text(category),
                     selected: isSelected,
                     onSelected: (selected) {
-                      ref.read(productFilterProvider.notifier).state =
-                          filter.copyWith(
-                        selectedCategory: selected ? category : null,
-                        clearCategory: !selected,
-                      );
+                      ref.read(productFilterProvider.notifier).state = filter
+                          .copyWith(
+                            selectedCategory: selected ? category : null,
+                            clearCategory: !selected,
+                          );
                     },
                   ),
                 );

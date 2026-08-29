@@ -6,19 +6,47 @@ import 'package:steph_g_food/features/search/providers/search_provider.dart';
 void main() {
   // Mock data avec des prix ajustés (< 30.0 pour correspondre au maxPriceFilterProvider par défaut)
   final mockProducts = [
-    const Product(id: '1', name: 'Cheeseburger', category: 'Burger', price: 15.0, description: '', image: ''),
-    const Product(id: '2', name: 'Pizza Margherita', category: 'Pizza', price: 20.0, description: '', image: ''),
-    const Product(id: '3', name: 'Chicken Burger', category: 'Burger', price: 18.0, description: '', image: ''),
-    const Product(id: '4', name: 'Tacos Supreme', category: 'Tacos', price: 25.0, description: '', image: ''),
+    const Product(
+      id: '1',
+      name: 'Cheeseburger',
+      category: 'Burger',
+      price: 15.0,
+      description: '',
+      image: '',
+    ),
+    const Product(
+      id: '2',
+      name: 'Pizza Margherita',
+      category: 'Pizza',
+      price: 20.0,
+      description: '',
+      image: '',
+    ),
+    const Product(
+      id: '3',
+      name: 'Chicken Burger',
+      category: 'Burger',
+      price: 18.0,
+      description: '',
+      image: '',
+    ),
+    const Product(
+      id: '4',
+      name: 'Tacos Supreme',
+      category: 'Tacos',
+      price: 25.0,
+      description: '',
+      image: '',
+    ),
   ];
 
   // Helper pour créer un ProviderContainer pré-configuré avec l'écouteur réactif
-  Future<ProviderContainer> createContainer({
-    List<Product>? products,
-  }) async {
+  Future<ProviderContainer> createContainer({List<Product>? products}) async {
     final container = ProviderContainer(
       overrides: [
-        productsListProvider.overrideWith((ref) async => products ?? mockProducts),
+        productsListProvider.overrideWith(
+          (ref) async => products ?? mockProducts,
+        ),
       ],
     );
     container.listen(filteredProductsProvider, (_, __) {});
@@ -27,24 +55,30 @@ void main() {
   }
 
   group('Tests Unitaires - filteredProductsProvider (Filtres de base)', () {
-    test('Retourne tous les produits si aucun filtre n\'est appliqué', () async {
-      final container = await createContainer();
-      addTearDown(container.dispose);
+    test(
+      'Retourne tous les produits si aucun filtre n\'est appliqué',
+      () async {
+        final container = await createContainer();
+        addTearDown(container.dispose);
 
-      final result = container.read(filteredProductsProvider);
-      expect(result.value, equals(mockProducts));
-    });
+        final result = container.read(filteredProductsProvider);
+        expect(result.value, equals(mockProducts));
+      },
+    );
 
-    test('Filtre correctement par recherche textuelle (insensible à la casse)', () async {
-      final container = await createContainer();
-      addTearDown(container.dispose);
+    test(
+      'Filtre correctement par recherche textuelle (insensible à la casse)',
+      () async {
+        final container = await createContainer();
+        addTearDown(container.dispose);
 
-      container.read(searchQueryProvider.notifier).state = 'pizza';
+        container.read(searchQueryProvider.notifier).state = 'pizza';
 
-      final result = container.read(filteredProductsProvider);
-      expect(result.value?.length, 1);
-      expect(result.value?.first.name, 'Pizza Margherita');
-    });
+        final result = container.read(filteredProductsProvider);
+        expect(result.value?.length, 1);
+        expect(result.value?.first.name, 'Pizza Margherita');
+      },
+    );
 
     test('Filtre correctement par catégorie', () async {
       final container = await createContainer();
@@ -64,7 +98,10 @@ void main() {
       container.read(maxPriceFilterProvider.notifier).state = 19.0;
 
       final result = container.read(filteredProductsProvider);
-      expect(result.value?.length, 2); // Cheeseburger (15.0) et Chicken Burger (18.0)
+      expect(
+        result.value?.length,
+        2,
+      ); // Cheeseburger (15.0) et Chicken Burger (18.0)
       expect(result.value?.every((p) => p.price <= 19.0), isTrue);
     });
   });
@@ -74,7 +111,8 @@ void main() {
       final container = await createContainer();
       addTearDown(container.dispose);
 
-      container.read(productSortOptionProvider.notifier).state = ProductSortOption.priceAsc;
+      container.read(productSortOptionProvider.notifier).state =
+          ProductSortOption.priceAsc;
 
       final result = container.read(filteredProductsProvider).value;
       expect(result?.map((p) => p.price).toList(), [15.0, 18.0, 20.0, 25.0]);
@@ -84,7 +122,8 @@ void main() {
       final container = await createContainer();
       addTearDown(container.dispose);
 
-      container.read(productSortOptionProvider.notifier).state = ProductSortOption.priceDesc;
+      container.read(productSortOptionProvider.notifier).state =
+          ProductSortOption.priceDesc;
 
       final result = container.read(filteredProductsProvider).value;
       expect(result?.map((p) => p.price).toList(), [25.0, 20.0, 18.0, 15.0]);
@@ -94,56 +133,68 @@ void main() {
       final container = await createContainer();
       addTearDown(container.dispose);
 
-      container.read(productSortOptionProvider.notifier).state = ProductSortOption.nameAsc;
+      container.read(productSortOptionProvider.notifier).state =
+          ProductSortOption.nameAsc;
 
       final result = container.read(filteredProductsProvider).value;
-      expect(
-        result?.map((p) => p.name).toList(),
-        ['Cheeseburger', 'Chicken Burger', 'Pizza Margherita', 'Tacos Supreme'],
+      expect(result?.map((p) => p.name).toList(), [
+        'Cheeseburger',
+        'Chicken Burger',
+        'Pizza Margherita',
+        'Tacos Supreme',
+      ]);
+    });
+  });
+
+  group(
+    'Tests Unitaires - filteredProductsProvider (Cas Limites / Edge Cases)',
+    () {
+      test(
+        'Retourne une liste vide lorsqu\'aucun produit ne correspond à la recherche',
+        () async {
+          final container = await createContainer();
+          addTearDown(container.dispose);
+
+          container.read(searchQueryProvider.notifier).state = 'Sushi';
+
+          final result = container.read(filteredProductsProvider);
+          expect(result.value, isEmpty);
+        },
       );
-    });
-  });
 
-  group('Tests Unitaires - filteredProductsProvider (Cas Limites / Edge Cases)', () {
-    test('Retourne une liste vide lorsqu\'aucun produit ne correspond à la recherche', () async {
-      final container = await createContainer();
-      addTearDown(container.dispose);
+      test(
+        'Combinaison simultanée de recherche, catégorie et prix max',
+        () async {
+          final container = await createContainer();
+          addTearDown(container.dispose);
 
-      container.read(searchQueryProvider.notifier).state = 'Sushi';
+          container.read(searchQueryProvider.notifier).state = 'Burger';
+          container.read(selectedCategoryProvider.notifier).state = 'Burger';
+          container.read(maxPriceFilterProvider.notifier).state = 16.0;
 
-      final result = container.read(filteredProductsProvider);
-      expect(result.value, isEmpty);
-    });
+          final result = container.read(filteredProductsProvider).value;
+          expect(result?.length, 1);
+          expect(result?.first.name, 'Cheeseburger');
+        },
+      );
 
-    test('Combinaison simultanée de recherche, catégorie et prix max', () async {
-      final container = await createContainer();
-      addTearDown(container.dispose);
+      test('Gère correctement une liste de produits initiale vide', () async {
+        final container = await createContainer(products: []);
+        addTearDown(container.dispose);
 
-      container.read(searchQueryProvider.notifier).state = 'Burger';
-      container.read(selectedCategoryProvider.notifier).state = 'Burger';
-      container.read(maxPriceFilterProvider.notifier).state = 16.0;
+        final result = container.read(filteredProductsProvider);
+        expect(result.value, isEmpty);
+      });
 
-      final result = container.read(filteredProductsProvider).value;
-      expect(result?.length, 1);
-      expect(result?.first.name, 'Cheeseburger');
-    });
+      test('Le filtre par catégorie "Tous" ne masque aucun produit', () async {
+        final container = await createContainer();
+        addTearDown(container.dispose);
 
-    test('Gère correctement une liste de produits initiale vide', () async {
-      final container = await createContainer(products: []);
-      addTearDown(container.dispose);
+        container.read(selectedCategoryProvider.notifier).state = 'Tous';
 
-      final result = container.read(filteredProductsProvider);
-      expect(result.value, isEmpty);
-    });
-
-    test('Le filtre par catégorie "Tous" ne masque aucun produit', () async {
-      final container = await createContainer();
-      addTearDown(container.dispose);
-
-      container.read(selectedCategoryProvider.notifier).state = 'Tous';
-
-      final result = container.read(filteredProductsProvider).value;
-      expect(result?.length, mockProducts.length);
-    });
-  });
+        final result = container.read(filteredProductsProvider).value;
+        expect(result?.length, mockProducts.length);
+      });
+    },
+  );
 }

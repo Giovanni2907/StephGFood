@@ -8,13 +8,12 @@ import 'package:steph_g_food/features/catalog/providers/favorites_notifier.dart'
 class ProductDetailScreen extends ConsumerStatefulWidget {
   final Product product;
 
-  const ProductDetailScreen({
-    Key? key,
-    required this.product,
-  }) : super(key: key);
+  const ProductDetailScreen({Key? key, required this.product})
+    : super(key: key);
 
   @override
-  ConsumerState<ProductDetailScreen> createState() => _ProductDetailScreenState();
+  ConsumerState<ProductDetailScreen> createState() =>
+      _ProductDetailScreenState();
 }
 
 class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
@@ -76,10 +75,8 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                         child: Image.asset(
                           widget.product.image,
                           fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => const Icon(
-                            LucideIcons.utensils,
-                            size: 64,
-                          ),
+                          errorBuilder: (context, error, stackTrace) =>
+                              const Icon(LucideIcons.utensils, size: 64),
                         ),
                       ),
                     ),
@@ -125,7 +122,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                   Text(
                     widget.product.description,
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.textTheme.bodyMedium?.color?.withOpacity(0.8),
+                      color: theme.textTheme.bodyMedium?.color?.withOpacity(
+                        0.8,
+                      ),
                       height: 1.4,
                     ),
                   ),
@@ -134,10 +133,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                   // Selecteur de quantité
                   Row(
                     children: [
-                      Text(
-                        'Quantité :',
-                        style: theme.textTheme.titleMedium,
-                      ),
+                      Text('Quantité :', style: theme.textTheme.titleMedium),
                       const Spacer(),
                       IconButton.filledTonal(
                         onPressed: _decrementQuantity,
@@ -187,13 +183,16 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                 icon: const Icon(LucideIcons.shoppingBag),
                 label: Text(
                   'Ajouter au panier (${(widget.product.price * _quantity).toStringAsFixed(2)} €)',
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 onPressed: () {
                   // Ajout au panier via le provider Riverpod
-                  ref.read(cartNotifierProvider.notifier).addProduct(
-                        widget.product,
-                      );
+                  ref
+                      .read(cartNotifierProvider.notifier)
+                      .addProduct(widget.product);
 
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(

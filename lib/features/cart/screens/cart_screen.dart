@@ -15,9 +15,7 @@ class CartScreen extends ConsumerWidget {
     final totalPrice = ref.watch(cartTotalPriceProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Mon Panier'),
-      ),
+      appBar: AppBar(title: const Text('Mon Panier')),
       body: cart.isEmpty
           ? const Center(child: Text('Votre panier est vide'))
           : Column(
@@ -71,13 +69,18 @@ class CartScreen extends ConsumerWidget {
                 ),
                 Container(
                   padding: const EdgeInsets.all(16),
-                  color: ColorScheme.dark(primary: Theme.of(context).colorScheme.primary).primary.withOpacity(0.1),
+                  color: ColorScheme.dark(
+                    primary: Theme.of(context).colorScheme.primary,
+                  ).primary.withOpacity(0.1),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text(
                         'Total :',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       Text(
                         '${totalPrice.toStringAsFixed(2)} €',
@@ -106,14 +109,16 @@ class CartScreen extends ConsumerWidget {
                                     SizedBox(
                                       width: 20,
                                       height: 20,
-                                      
+
                                       child: CircularProgressIndicator(
                                         strokeWidth: 2,
                                         color: Colors.white,
                                       ),
                                     ),
                                     SizedBox(width: 10),
-                                    Text('Validation de la commande en cours...'),
+                                    Text(
+                                      'Validation de la commande en cours...',
+                                    ),
                                   ],
                                 ),
                                 duration: Duration(seconds: 1),
@@ -124,24 +129,34 @@ class CartScreen extends ConsumerWidget {
                             await Future.delayed(const Duration(seconds: 1));
 
                             // 2. Enregistrer la commande dans le CommandeNotifier
-                           ref.read(commandeProvider.notifier).passezCommande(
-      cart.map((cartItem) => CommandeItem(
-        product: cartItem.product,
-        quantity: cartItem.quantity,
-      )).toList(),
-      totalPrice,
-    );
+                            ref
+                                .read(commandeProvider.notifier)
+                                .passezCommande(
+                                  cart
+                                      .map(
+                                        (cartItem) => CommandeItem(
+                                          product: cartItem.product,
+                                          quantity: cartItem.quantity,
+                                        ),
+                                      )
+                                      .toList(),
+                                  totalPrice,
+                                );
 
                             // 3. Vider le panier dans le state Riverpod
                             ref.read(cartNotifierProvider.notifier).clearCart();
 
                             // 4. Confirmer le succès et rediriger
                             if (context.mounted) {
-                              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                              ScaffoldMessenger.of(
+                                context,
+                              ).hideCurrentSnackBar();
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   backgroundColor: Colors.green,
-                                  content: const Text('Commande validée avec succès ! 🎉'),
+                                  content: const Text(
+                                    'Commande validée avec succès ! 🎉',
+                                  ),
                                   action: SnackBarAction(
                                     label: 'OK',
                                     textColor: Colors.white,
@@ -164,7 +179,10 @@ class CartScreen extends ConsumerWidget {
                     ),
                     child: const Text(
                       'Valider la commande',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),

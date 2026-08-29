@@ -17,18 +17,12 @@ class ProductListScreen extends ConsumerWidget {
 
     return Scaffold(
       body: productsAsync.when(
-        loading: () => const Center(
-          child: CircularProgressIndicator(),
-        ),
-        error: (error, stack) => Center(
-          child: Text('Erreur : $error'),
-        ),
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, stack) => Center(child: Text('Erreur : $error')),
         data: (products) {
           // Si la liste filtrée est vide
           if (products.isEmpty) {
-            return const Center(
-              child: Text('Aucun produit disponible'),
-            );
+            return const Center(child: Text('Aucun produit disponible'));
           }
 
           return GridView.builder(

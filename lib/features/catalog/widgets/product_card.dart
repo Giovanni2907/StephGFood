@@ -63,10 +63,14 @@ class ProductCard extends ConsumerWidget {
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) => Container(
                           height: 100,
-                          color: isDarkMode ? Colors.grey[800] : Colors.grey[300],
+                          color: isDarkMode
+                              ? Colors.grey[800]
+                              : Colors.grey[300],
                           child: Icon(
                             Icons.image_not_supported,
-                            color: isDarkMode ? Colors.grey[500] : Colors.grey[600],
+                            color: isDarkMode
+                                ? Colors.grey[500]
+                                : Colors.grey[600],
                           ),
                         ),
                       ),
@@ -149,7 +153,9 @@ class ProductCard extends ConsumerWidget {
 
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text('${product.name} ajouté au panier'),
+                                content: Text(
+                                  '${product.name} ajouté au panier',
+                                ),
                                 duration: const Duration(seconds: 1),
                               ),
                             );

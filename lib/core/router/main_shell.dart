@@ -18,11 +18,19 @@ class MainShell extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('SGF', style: TextStyle(fontWeight: FontWeight.values[7], fontSize: 15, color: AppColors.primary)),
+        title: Text(
+          'SGF',
+          style: TextStyle(
+            fontWeight: FontWeight.values[7],
+            fontSize: 15,
+            color: AppColors.primary,
+          ),
+        ),
         actions: [
           IconButton(
-            icon: const Icon(LucideIcons.sunMedium),  
-            onPressed: () => ref.read(themeNotifierProvider.notifier).toggleTheme(false),
+            icon: const Icon(LucideIcons.sunMedium),
+            onPressed: () =>
+                ref.read(themeNotifierProvider.notifier).toggleTheme(false),
           ),
           Stack(
             alignment: Alignment.center,
@@ -43,7 +51,11 @@ class MainShell extends ConsumerWidget {
                     ),
                     child: Text(
                       '$unreadNotifs',
-                      style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
@@ -63,8 +75,14 @@ class MainShell extends ConsumerWidget {
         },
         destinations: const [
           NavigationDestination(icon: Icon(LucideIcons.home), label: 'Accueil'),
-          NavigationDestination(icon: Icon(LucideIcons.search), label: 'Recherche'),
-          NavigationDestination(icon: Icon(LucideIcons.shoppingCart), label: 'Commandes'),
+          NavigationDestination(
+            icon: Icon(LucideIcons.search),
+            label: 'Recherche',
+          ),
+          NavigationDestination(
+            icon: Icon(LucideIcons.shoppingCart),
+            label: 'Commandes',
+          ),
           NavigationDestination(icon: Icon(LucideIcons.user), label: 'Profil'),
         ],
       ),

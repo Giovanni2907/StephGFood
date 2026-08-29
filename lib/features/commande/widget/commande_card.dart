@@ -27,10 +27,15 @@ class CommandeCard extends ConsumerWidget {
               children: [
                 Text(
                   order.id,
-                  style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: order.isActive
                         ? theme.colorScheme.primary.withOpacity(0.15)
@@ -40,7 +45,9 @@ class CommandeCard extends ConsumerWidget {
                   child: Text(
                     order.status.label,
                     style: TextStyle(
-                      color: order.isActive ? theme.colorScheme.primary : Colors.grey[700],
+                      color: order.isActive
+                          ? theme.colorScheme.primary
+                          : Colors.grey[700],
                       fontWeight: FontWeight.bold,
                       fontSize: 12,
                     ),
@@ -83,11 +90,17 @@ class CommandeCard extends ConsumerWidget {
               children: [
                 Row(
                   children: [
-                    const Icon(LucideIcons.mapPin, size: 16, color: Colors.grey),
+                    const Icon(
+                      LucideIcons.mapPin,
+                      size: 16,
+                      color: Colors.grey,
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       order.deliveryAddress,
-                      style: theme.textTheme.bodySmall?.copyWith(color: Colors.grey),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: Colors.grey,
+                      ),
                     ),
                   ],
                 ),

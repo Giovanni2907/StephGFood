@@ -12,30 +12,30 @@ class CategorySelector extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedCategory = ref.watch(selectedCategoryProvider);
     final primaryColor = Theme.of(context).colorScheme.primary;
-    void filtrer(){
+    void filtrer() {
       final products = ref.watch(filteredProductsProvider);
-          products.isEmpty
-              ? const SliverFillRemaining(
-                  child: Center(
-                    child: Text('Aucun produit disponible dans cette catégorie.'),
-                  ),
-                )
-              : SliverPadding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 16),
-                          child: ProductCard(product: products[index], isFavorite: false, onFavoriteToggle: () {  },),
-                        );
-                      },
-                      childCount: products.length,
+      products.isEmpty
+          ? const SliverFillRemaining(
+              child: Center(
+                child: Text('Aucun produit disponible dans cette catégorie.'),
+              ),
+            )
+          : SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              sliver: SliverList(
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: ProductCard(
+                      product: products[index],
+                      isFavorite: false,
+                      onFavoriteToggle: () {},
                     ),
-                  ),
-                );
+                  );
+                }, childCount: products.length),
+              ),
+            );
     }
-
 
     return SizedBox(
       height: 30,

@@ -6,7 +6,9 @@ import 'package:steph_g_food/features/catalog/models/product.dart';
 
 // Provider synchrone pour SharedPreferences (surchargé dans main.dart)
 final sharedPreferencesProvider = Provider<SharedPreferences>((ref) {
-  throw UnimplementedError('SharedPreferences doit être initialisé dans main.dart');
+  throw UnimplementedError(
+    'SharedPreferences doit être initialisé dans main.dart',
+  );
 });
 
 // Provider du Repository
@@ -41,8 +43,9 @@ class ProductRepository {
   }
 
   Future<void> saveProducts(List<Product> products) async {
-    final List<Map<String, dynamic>> jsonList =
-        products.map((p) => p.toJson()).toList();
+    final List<Map<String, dynamic>> jsonList = products
+        .map((p) => p.toJson())
+        .toList();
     final String jsonString = jsonEncode(jsonList);
 
     await _prefs.setString(_productsKey, jsonString);

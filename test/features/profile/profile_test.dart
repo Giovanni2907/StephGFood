@@ -45,10 +45,9 @@ void main() {
       final container = ProviderContainer();
       addTearDown(container.dispose);
 
-      container.read(userProvider.notifier).updateAddress(
-            '456 Avenue Indépendance',
-            'Bâtiment C',
-          );
+      container
+          .read(userProvider.notifier)
+          .updateAddress('456 Avenue Indépendance', 'Bâtiment C');
 
       final user = container.read(userProvider);
       expect(user.address, '456 Avenue Indépendance');
@@ -57,31 +56,31 @@ void main() {
   });
 
   group('Tests de Widget - ProfileScreen', () {
-    testWidgets('ProfileScreen affiche correctement les informations utilisateur initiales', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
-            home: ProfileScreen(),
-          ),
-        ),
-      );
+    testWidgets(
+      'ProfileScreen affiche correctement les informations utilisateur initiales',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(
+          const ProviderScope(child: MaterialApp(home: ProfileScreen())),
+        );
 
-      // Vérification des données affichées à l'écran
-      expect(find.text('Profil'), findsOneWidget);
-      expect(find.text('Stephanie Giovanni'), findsOneWidget);
-      expect(find.text('stephanie@example.com'), findsOneWidget);
-      expect(find.text('123 Rue de l\'Informatique, Antananarivo'), findsOneWidget);
-      expect(find.text('Appartement 4B'), findsOneWidget);
-      expect(find.text('Mode Sombre'), findsOneWidget);
-    });
+        // Vérification des données affichées à l'écran
+        expect(find.text('Profil'), findsOneWidget);
+        expect(find.text('Stephanie Giovanni'), findsOneWidget);
+        expect(find.text('stephanie@example.com'), findsOneWidget);
+        expect(
+          find.text('123 Rue de l\'Informatique, Antananarivo'),
+          findsOneWidget,
+        );
+        expect(find.text('Appartement 4B'), findsOneWidget);
+        expect(find.text('Mode Sombre'), findsOneWidget);
+      },
+    );
 
-    testWidgets('Modifier l\'adresse via le dialogue met à jour l\'affichage', (WidgetTester tester) async {
+    testWidgets('Modifier l\'adresse via le dialogue met à jour l\'affichage', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
-            home: ProfileScreen(),
-          ),
-        ),
+        const ProviderScope(child: MaterialApp(home: ProfileScreen())),
       );
 
       // 1. Cliquer sur le bouton d'édition de l'adresse
@@ -107,15 +106,15 @@ void main() {
       expect(find.text('Étage 2'), findsOneWidget);
     });
 
-    testWidgets('Activer le Switch de Mode Sombre bascule le thème', (WidgetTester tester) async {
+    testWidgets('Activer le Switch de Mode Sombre bascule le thème', (
+      WidgetTester tester,
+    ) async {
       late ProviderContainer container;
 
       await tester.pumpWidget(
         UncontrolledProviderScope(
           container: container = ProviderContainer(),
-          child: const MaterialApp(
-            home: ProfileScreen(),
-          ),
+          child: const MaterialApp(home: ProfileScreen()),
         ),
       );
 

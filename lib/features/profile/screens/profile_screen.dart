@@ -6,7 +6,12 @@ import 'package:steph_g_food/features/profile/providers/user_provider.dart';
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
-  void _showEditAddressDialog(BuildContext context, WidgetRef ref, String currentAddress, String currentComplement) {
+  void _showEditAddressDialog(
+    BuildContext context,
+    WidgetRef ref,
+    String currentAddress,
+    String currentComplement,
+  ) {
     final addressController = TextEditingController(text: currentAddress);
     final complementController = TextEditingController(text: currentComplement);
 
@@ -24,7 +29,9 @@ class ProfileScreen extends ConsumerWidget {
             const SizedBox(height: 12),
             TextField(
               controller: complementController,
-              decoration: const InputDecoration(labelText: 'Complément (ex: Appt)'),
+              decoration: const InputDecoration(
+                labelText: 'Complément (ex: Appt)',
+              ),
             ),
           ],
         ),
@@ -35,7 +42,9 @@ class ProfileScreen extends ConsumerWidget {
           ),
           ElevatedButton(
             onPressed: () {
-              ref.read(userProvider.notifier).updateAddress(
+              ref
+                  .read(userProvider.notifier)
+                  .updateAddress(
                     addressController.text,
                     complementController.text,
                   );
@@ -55,9 +64,7 @@ class ProfileScreen extends ConsumerWidget {
     final isDarkMode = themeMode == ThemeMode.dark;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profil'),
-      ),
+      appBar: AppBar(title: const Text('Profil')),
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
@@ -67,7 +74,9 @@ class ProfileScreen extends ConsumerWidget {
               children: [
                 CircleAvatar(
                   radius: 45,
-                  backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                  backgroundColor: Theme.of(
+                    context,
+                  ).colorScheme.primaryContainer,
                   child: Icon(
                     Icons.person,
                     size: 50,
@@ -78,8 +87,8 @@ class ProfileScreen extends ConsumerWidget {
                 Text(
                   user.name,
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ],
             ),
@@ -90,9 +99,9 @@ class ProfileScreen extends ConsumerWidget {
           // Section Informations
           Text(
             'Informations personnelles',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           Card(
@@ -111,9 +120,9 @@ class ProfileScreen extends ConsumerWidget {
             children: [
               Text(
                 'Adresse de livraison',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
               ),
               IconButton(
                 icon: const Icon(Icons.edit_outlined, size: 20),
@@ -139,17 +148,15 @@ class ProfileScreen extends ConsumerWidget {
           // Section Paramètres
           Text(
             'Préférences',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           Card(
             child: SwitchListTile(
               title: const Text('Mode Sombre'),
-              secondary: Icon(
-                isDarkMode ? Icons.dark_mode : Icons.light_mode,
-              ),
+              secondary: Icon(isDarkMode ? Icons.dark_mode : Icons.light_mode),
               value: isDarkMode,
               onChanged: (bool value) {
                 // Appel de la méthode propre du Notifier

@@ -6,7 +6,8 @@ final productsProvider = Provider<List<Product>>((ref) {
     Product(
       id: '1',
       name: 'Burger StephG Spécial',
-      description: 'Double steak haché, fromage cheddar fondu, sauce maison StephG et condiments frais.',
+      description:
+          'Double steak haché, fromage cheddar fondu, sauce maison StephG et condiments frais.',
       price: 12.50,
       category: 'Burger',
       image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd',
@@ -15,7 +16,8 @@ final productsProvider = Provider<List<Product>>((ref) {
     Product(
       id: '2',
       name: 'Pizza Pepperoni Supreme',
-      description: 'Sauce tomate artisanale, mozzarella fondante et généreuses tranches de pepperoni.',
+      description:
+          'Sauce tomate artisanale, mozzarella fondante et généreuses tranches de pepperoni.',
       price: 15.00,
       category: 'Pizza',
       image: 'https://images.unsplash.com/photo-1628840042765-356cda07504e',
@@ -24,7 +26,8 @@ final productsProvider = Provider<List<Product>>((ref) {
     Product(
       id: '3',
       name: 'Tacos Poulet Pané',
-      description: 'Tortilla garnie de poulet croustillant, frites, sauce fromagère onctueuse.',
+      description:
+          'Tortilla garnie de poulet croustillant, frites, sauce fromagère onctueuse.',
       price: 9.90,
       category: 'Tacos',
       image: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47',

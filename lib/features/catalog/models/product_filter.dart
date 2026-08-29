@@ -1,8 +1,4 @@
-enum ProductSortOption {
-  nameAsc,
-  priceAsc,
-  priceDesc,
-}
+enum ProductSortOption { nameAsc, priceAsc, priceDesc }
 
 class ProductFilter {
   final String searchQuery;
@@ -26,7 +22,9 @@ class ProductFilter {
   }) {
     return ProductFilter(
       searchQuery: searchQuery ?? this.searchQuery,
-      selectedCategory: clearCategory ? null : (selectedCategory ?? this.selectedCategory),
+      selectedCategory: clearCategory
+          ? null
+          : (selectedCategory ?? this.selectedCategory),
       maxPrice: maxPrice ?? this.maxPrice,
       sortOption: sortOption ?? this.sortOption,
     );

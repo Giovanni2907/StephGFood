@@ -9,7 +9,10 @@ final selectedCategoryProvider = StateProvider<String>((ref) => 'Tous');
 
 // 2. Provider de Tri
 enum ProductSortOption { none, priceAsc, priceDesc, nameAsc }
-final productSortOptionProvider = StateProvider<ProductSortOption>((ref) => ProductSortOption.none);
+
+final productSortOptionProvider = StateProvider<ProductSortOption>(
+  (ref) => ProductSortOption.none,
+);
 
 // 3. FutureProvider chargé depuis le repository
 final productsListProvider = FutureProvider<List<Product>>((ref) async {
@@ -27,12 +30,12 @@ final filteredProductsProvider = Provider<AsyncValue<List<Product>>>((ref) {
 
   return productsAsync.whenData((products) {
     var result = products.where((product) {
-      final matchesSearch = product.name
-          .toLowerCase()
-          .contains(searchQuery.toLowerCase());
+      final matchesSearch = product.name.toLowerCase().contains(
+        searchQuery.toLowerCase(),
+      );
 
-      final matchesCategory = selectedCategory == 'Tous' ||
-          product.category == selectedCategory;
+      final matchesCategory =
+          selectedCategory == 'Tous' || product.category == selectedCategory;
 
       final matchesPrice = product.price <= maxPrice;
 

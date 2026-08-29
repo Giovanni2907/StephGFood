@@ -28,7 +28,6 @@ class Commande {
   final CommandeStatus status;
   final String deliveryAddress;
 
-
   const Commande({
     required this.id,
     required this.date,
@@ -38,5 +37,7 @@ class Commande {
     required this.deliveryAddress,
   });
 
-  bool get isActive => status == CommandeStatus.enPreparation || status == CommandeStatus.enPreparation;
+  bool get isActive =>
+      status == CommandeStatus.enPreparation ||
+      status == CommandeStatus.enPreparation;
 }

@@ -5,10 +5,7 @@ class CartItem {
   final Product product;
   final int quantity;
 
-  const CartItem({
-    required this.product,
-    required this.quantity,
-  });
+  const CartItem({required this.product, required this.quantity});
 
   CartItem copyWith({Product? product, int? quantity}) {
     return CartItem(
@@ -33,7 +30,9 @@ class CartItem {
         id: map['id'] ?? '',
         name: map['name'] ?? '',
         category: map['category'] ?? '',
-        price: (map['price'] as num).toDouble(), description: '', image: '',
+        price: (map['price'] as num).toDouble(),
+        description: '',
+        image: '',
       ),
       quantity: map['quantity'] ?? 1,
     );

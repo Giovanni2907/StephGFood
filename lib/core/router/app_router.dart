@@ -9,7 +9,6 @@ import 'main_shell.dart';
 import 'package:steph_g_food/features/catalog/screens/home_screen.dart';
 import 'package:steph_g_food/features/search/screens/search_screen.dart';
 
-
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey();
 
 class AppRouter {
@@ -70,15 +69,16 @@ class AppRouter {
         parentNavigatorKey: _rootNavigatorKey,
         path: '/notifications',
         name: 'notifications',
-        builder: (context, state) => const Center(child: Text('Écran Notifications')),
+        builder: (context, state) =>
+            const Center(child: Text('Écran Notifications')),
       ),
       GoRoute(
-  path: '/product-detail',
-  builder: (context, state) {
-    final product = state.extra as Product;
-    return ProductDetailScreen(product: product);
-  },
-),
+        path: '/product-detail',
+        builder: (context, state) {
+          final product = state.extra as Product;
+          return ProductDetailScreen(product: product);
+        },
+      ),
     ],
   );
 }

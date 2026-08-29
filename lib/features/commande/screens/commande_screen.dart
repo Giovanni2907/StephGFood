@@ -36,7 +36,11 @@ class CommandeScreen extends ConsumerWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(LucideIcons.shoppingBag, size: 48, color: Colors.grey),
+                        Icon(
+                          LucideIcons.shoppingBag,
+                          size: 48,
+                          color: Colors.grey,
+                        ),
                         SizedBox(height: 12),
                         Text(
                           'Aucune commande en cours pour le moment.',

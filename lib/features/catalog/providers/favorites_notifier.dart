@@ -35,6 +35,6 @@ class FavoritesNotifier extends StateNotifier<Set<String>> {
 
 final favoritesNotifierProvider =
     StateNotifierProvider<FavoritesNotifier, Set<String>>((ref) {
-  final prefs = ref.watch(sharedPreferencesProvider);
-  return FavoritesNotifier(prefs);
-});
+      final prefs = ref.watch(sharedPreferencesProvider);
+      return FavoritesNotifier(prefs);
+    });

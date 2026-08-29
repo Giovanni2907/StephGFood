@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:steph_g_food/features/cart/providers/cart_provider.dart';
-import 'package:steph_g_food/features/cart/screens/cart_screen.dart'; 
+import 'package:steph_g_food/features/cart/screens/cart_screen.dart';
 
 class CartFloatingActionButton extends ConsumerWidget {
   const CartFloatingActionButton({super.key});
@@ -14,9 +14,9 @@ class CartFloatingActionButton extends ConsumerWidget {
     return FloatingActionButton(
       onPressed: () {
         // Redirige vers la page du panier/commande au clic
-        Navigator.of(context).push(
-          MaterialPageRoute(builder: (context) => const CartScreen()),
-        );
+        Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (context) => const CartScreen()));
       },
       child: Badge(
         // Le badge apparaît dès qu'au moins 1 article est sélectionné

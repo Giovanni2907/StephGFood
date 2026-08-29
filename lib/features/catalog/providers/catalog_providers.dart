@@ -22,12 +22,13 @@ final filteredProductsProvider = Provider<AsyncValue<List<Product>>>((ref) {
   return productsAsync.whenData((products) {
     var result = products.where((product) {
       // 1. Filtre par recherche texte
-      final matchesSearch = product.name
-          .toLowerCase()
-          .contains(filter.searchQuery.toLowerCase());
+      final matchesSearch = product.name.toLowerCase().contains(
+        filter.searchQuery.toLowerCase(),
+      );
 
       // 2. Filtre par catégorie
-      final matchesCategory = filter.selectedCategory == null ||
+      final matchesCategory =
+          filter.selectedCategory == null ||
           product.category == filter.selectedCategory;
 
       // 3. Filtre par prix maximum

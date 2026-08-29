@@ -5,17 +5,11 @@ class CartItem {
   final Product product;
   final int quantity;
 
-  const CartItem({
-    required this.product,
-    this.quantity = 1,
-  });
+  const CartItem({required this.product, this.quantity = 1});
 
   double get totalPrice => product.price * quantity;
 
-  CartItem copyWith({
-    Product? product,
-    int? quantity,
-  }) {
+  CartItem copyWith({Product? product, int? quantity}) {
     return CartItem(
       product: product ?? this.product,
       quantity: quantity ?? this.quantity,
@@ -34,7 +28,7 @@ class CartNotifier extends StateNotifier<List<CartItem>> {
           if (i == index)
             state[i].copyWith(quantity: state[i].quantity + 1)
           else
-            state[i]
+            state[i],
       ];
     } else {
       state = [...state, CartItem(product: product, quantity: 1)];
@@ -42,8 +36,8 @@ class CartNotifier extends StateNotifier<List<CartItem>> {
   }
 
   void clearCart() {
-  state = [];
-}
+    state = [];
+  }
 
   void removeProduct(String productId) {
     state = state.where((item) => item.product.id != productId).toList();
@@ -58,7 +52,7 @@ class CartNotifier extends StateNotifier<List<CartItem>> {
             if (i == index)
               state[i].copyWith(quantity: state[i].quantity - 1)
             else
-              state[i]
+              state[i],
         ];
       } else {
         removeProduct(productId);
@@ -70,9 +64,10 @@ class CartNotifier extends StateNotifier<List<CartItem>> {
   int get totalItems => state.fold(0, (sum, item) => sum + item.quantity);
 }
 
-final cartNotifierProvider = StateNotifierProvider<CartNotifier, List<CartItem>>(
-  (ref) => CartNotifier(),
-);
+final cartNotifierProvider =
+    StateNotifierProvider<CartNotifier, List<CartItem>>(
+      (ref) => CartNotifier(),
+    );
 final cartTotalPriceProvider = Provider<double>((ref) {
   final cart = ref.watch(cartNotifierProvider);
   return cart.fold(0, (sum, item) => sum + item.totalPrice);
